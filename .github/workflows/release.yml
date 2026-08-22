@@ -1,0 +1,33 @@
+name: Release
+
+# Push a tag like "v1.0.0" to build a zip of the extension
+# and attach it to a new GitHub Release automatically.
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Package extension into a zip
+        run: |
+          zip -r "focusguard-${GITHUB_REF_NAME}.zip" . \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x ".gitignore" \
+            -x "*.md" \
+            -x "LICENSE"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: focusguard-${{ github.ref_name }}.zip
+          generate_release_notes: true
