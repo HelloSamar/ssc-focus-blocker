@@ -1,43 +1,603 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="utf-8"/>
+  <title>FocusGuard - Settings</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    textarea {
+    :root {
+      --bg: #f4f4f2;
+      --white: #ffffff;
+      --surf2: #f8f8f6;
+      --green: #16a34a;
+      --green2: #15803d;
+      --ink: #18181b;
+      --ink2: #52525b;
+      --muted: #71717a;
+      --border: #e4e4e7;
+      --bdr2: #d4d4d8;
+      --red: #ef4444;
+      --amber: #ca8a04;
+      --r: 12px;
+    }
+
+    body.dark {
+      --bg: #16171a;
+      --white: #1f2023;
+      --surf2: #26272b;
+      --ink: #f4f4f5;
+      --ink2: #d4d4d8;
+      --muted: #9a9aa2;
+      --border: #35363b;
+      --bdr2: #46474d;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      padding: 32px 20px 48px;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .page {
+      max-width: 640px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      border-left: 4px solid var(--green);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .header-icon { width: 40px; height: 40px; flex-shrink: 0; }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+
+    .header-title span { color: var(--green); }
+
+    .header-sub {
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 3px;
+    }
+
+    .header-spacer { flex: 1; }
+
+    .icon-btn {
+      background: var(--surf2);
+      border: 1.5px solid var(--border);
+      color: var(--ink2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .icon-btn:hover { border-color: var(--green); color: var(--green); }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--green);
+      flex: 0 0 auto;
+    }
+
+    .badge {
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #dcfce7;
+      color: var(--green2);
+      border: 1px solid #bbf7d0;
+      letter-spacing: 0.04em;
+    }
+
+    body.dark .badge { background: #14301f; border-color: #1e4a2d; color: #4ade80; }
+
+    .hint {
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 10.5px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .lock-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    .mono-input {
+      flex: 1;
+      min-width: 140px;
+      background: var(--surf2);
+      border: 1.5px solid var(--border);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 9px 13px;
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 12.5px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .mono-input:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(22,163,74,0.1);
+    }
+
+    .mono-input::placeholder { color: var(--muted); }
+
+    textarea.mono-input {
+      resize: vertical;
+      min-height: 100px;
+      line-height: 1.7;
       width: 100%;
-      height: 120px;
-      margin-bottom: 8px;
-      font-family: monospace;
     }
-    button {
-      padding: 6px 10px;
-      margin-bottom: 15px;
+
+    textarea.mono-input:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      background: var(--bg);
     }
-    ul { line-height: 1.8; }
-    #lockSection { margin-bottom: 20px; }
+
+    .field-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 10.5px;
+    }
+
+    .live-count { color: var(--muted); }
+    .invalid-msg { color: var(--red); }
+
+    .btn {
+      padding: 9px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      transition: all 0.15s;
+    }
+
+    .btn-lime {
+      background: var(--green);
+      color: #ffffff;
+      box-shadow: 0 1px 0 var(--green2), 0 3px 10px rgba(22,163,74,0.2);
+    }
+
+    .btn-lime:hover {
+      background: var(--green2);
+      transform: translateY(-1px);
+      box-shadow: 0 1px 0 #14532d, 0 5px 14px rgba(22,163,74,0.28);
+    }
+
+    .btn-lime:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-ghost {
+      background: var(--white);
+      border: 1.5px solid var(--bdr2);
+      color: var(--ink2);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--green);
+      color: var(--green);
+      background: #f0fdf4;
+    }
+
+    body.dark .btn-ghost:hover { background: #14301f; }
+
+    .btn-ghost:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .lock-status {
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 13px;
+      border-radius: 20px;
+      letter-spacing: 0.06em;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .locked { background: #fef2f2; color: var(--red); border: 1px solid #fecaca; }
+    .unlocked { background: #f0fdf4; color: var(--green); border: 1px solid #bbf7d0; }
+    .focusing { background: #fefce8; color: #ca8a04; border: 1px solid #fde68a; }
+
+    body.dark .locked { background: #3a1414; border-color: #5c1f1f; }
+    body.dark .unlocked { background: #14301f; border-color: #1e4a2d; }
+    body.dark .focusing { background: #332a0d; border-color: #524212; }
+
+    .save-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .save-feedback {
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 11px;
+      color: var(--green);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .save-feedback.show { opacity: 1; }
+
+    .blocklist-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .domain-tag {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: var(--green2);
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 10.5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    body.dark .domain-tag { background: #14301f; border-color: #1e4a2d; color: #4ade80; }
+
+    .empty { font-family: "Consolas", "SFMono-Regular", monospace; font-size: 11px; color: var(--muted); }
+
+    .io-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .stat-box {
+      background: var(--surf2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--green);
+      line-height: 1.1;
+    }
+
+    .stat-label {
+      margin-top: 4px;
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 9.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .week-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 76px;
+      padding-top: 8px;
+    }
+
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 5px;
+      height: 100%;
+    }
+
+    .bar {
+      width: 100%;
+      max-width: 22px;
+      background: var(--green);
+      border-radius: 4px 4px 0 0;
+      min-height: 4px;
+      transition: height 0.2s;
+    }
+
+    .bar-label {
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 9px;
+      color: var(--muted);
+    }
+
+    .top-sites-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 11.5px;
+      background: var(--surf2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 11px;
+    }
+
+    .stat-row span:last-child { color: var(--green2); font-weight: 700; }
+    body.dark .stat-row span:last-child { color: #4ade80; }
+
+    #lockoutMsg {
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 10.5px;
+      color: var(--amber);
+    }
+
+    .timers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .timer-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 11.5px;
+      background: var(--surf2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 11px;
+    }
+
+    .timer-label {
+      flex: 1;
+      color: var(--ink2);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .timer-time {
+      color: var(--green2);
+      font-weight: 700;
+      min-width: 46px;
+      text-align: right;
+    }
+
+    body.dark .timer-time { color: #4ade80; }
+
+    .timer-cancel {
+      background: transparent;
+      border: 1px solid var(--bdr2);
+      color: var(--muted);
+      border-radius: 6px;
+      width: 22px;
+      height: 22px;
+      line-height: 1;
+      cursor: pointer;
+      font-size: 12px;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .timer-cancel:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
   </style>
 </head>
 <body>
+  <div class="page">
+    <div class="page-header">
+      <img class="header-icon" src="icon48.png" alt="FocusGuard"/>
+      <div>
+        <div class="header-title">Focus<span>Guard</span> Settings</div>
+        <div class="header-sub">// blocklist / password / protection</div>
+      </div>
+      <div class="header-spacer"></div>
+      <button class="icon-btn" id="darkModeBtn" type="button">🌙 Dark</button>
+    </div>
 
-  <div id="lockSection">
-    <h3>Enter Password to Edit</h3>
-    <input type="password" id="passwordInput" placeholder="Password">
-    <button id="unlockBtn">Unlock</button>
-    <button id="setPasswordBtn">Set / Change Password</button>
-    <p id="lockStatus">Locked</p>
+    <div class="card">
+      <div class="card-title">
+        <svg class="title-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="10" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Password Protection
+      </div>
+      <div class="lock-row">
+        <input class="mono-input" type="password" id="passwordInput" placeholder="enter password"/>
+        <button class="btn btn-lime" id="unlockBtn" type="button">Unlock</button>
+        <button class="btn btn-ghost" id="setPasswordBtn" type="button">Set Password</button>
+      </div>
+      <div><span class="lock-status locked" id="lockStatus">Locked</span></div>
+      <div id="lockoutMsg"></div>
+      <div class="hint">Auto-locks after 5 minutes idle. Note: uninstalling or disabling the extension in chrome://extensions also removes protection — that's a browser limitation, not a bypass we can close.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg class="title-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M6.5 17.5 17.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Blocked Sites <span class="badge" id="siteCount">🔒 hidden</span>
+      </div>
+      <div class="hint">One domain per line. Full URLs are cleaned automatically.</div>
+      <textarea class="mono-input" id="bulkInput" disabled
+        placeholder="🔒 Enter password to view blocked sites"></textarea>
+      <div class="field-meta">
+        <span class="live-count" id="bulkLiveCount"></span>
+        <span class="invalid-msg" id="bulkInvalidMsg"></span>
+      </div>
+      <div class="save-row">
+        <span class="save-feedback" id="siteFeedback">// saved</span>
+        <button class="btn btn-lime" id="saveBulk" type="button" disabled>Save Blocklist</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg class="title-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M16 16 21 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Keyword Blocking <span class="badge" id="keywordCount">🔒 hidden</span>
+      </div>
+      <div class="hint">Block any URL containing these words. One keyword per line.</div>
+      <textarea class="mono-input" id="keywordInput" disabled
+        placeholder="🔒 Enter password to view keywords"></textarea>
+      <div class="field-meta">
+        <span class="live-count" id="kwLiveCount"></span>
+        <span class="invalid-msg" id="kwInvalidMsg"></span>
+      </div>
+      <div class="save-row">
+        <span class="save-feedback" id="kwFeedback">// saved</span>
+        <button class="btn btn-lime" id="saveKeywords" type="button" disabled>Save Keywords</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg class="title-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3v12M12 15l-4-4M12 15l4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Import / Export
+      </div>
+      <div class="hint">Back up your blocklist and keywords, or move them to another browser.</div>
+      <div class="io-row">
+        <button class="btn btn-ghost" id="exportBtn" type="button" disabled>Export JSON</button>
+        <button class="btn btn-ghost" id="importBtn" type="button" disabled>Import JSON</button>
+        <input type="file" id="importInput" accept="application/json" style="display:none"/>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg class="title-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Active Tab Timers <span class="badge" id="timerCount">🔒 hidden</span>
+      </div>
+      <div class="hint">Set from the toolbar popup. A timer closes its tab — or just pauses the video — when it runs out.</div>
+      <div class="timers-list" id="timersList">
+        <div class="empty">🔒 Unlock to view</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg class="title-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 19h16M7 19V9M12 19V5M17 19v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Your Progress
+      </div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-value" id="statsTotal">🔒</div>
+          <div class="stat-label">Total blocks</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="statsStreak">🔒</div>
+          <div class="stat-label">Current streak</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="statsLongest">🔒</div>
+          <div class="stat-label">Best streak</div>
+        </div>
+      </div>
+      <div class="hint">Last 7 days</div>
+      <div class="week-chart" id="weekChart"></div>
+      <div class="hint">Most tempting sites</div>
+      <div class="top-sites-list" id="topSitesList">
+        <div class="empty">🔒 Unlock to view</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg class="title-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 6h11M8 12h11M8 18h11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="4" cy="6" r="1.4" fill="currentColor"/>
+          <circle cx="4" cy="12" r="1.4" fill="currentColor"/>
+          <circle cx="4" cy="18" r="1.4" fill="currentColor"/>
+        </svg>
+        Active Blocklist
+      </div>
+      <div class="blocklist-grid" id="blocklistGrid">
+        <div class="empty">🔒 Unlock to view blocklist</div>
+      </div>
+    </div>
   </div>
-
-  <h2>Blocked Sites (Bulk Edit)</h2>
-  <textarea id="bulkInput"></textarea>
-  <button id="saveBulk">Save Blocklist</button>
-
-  <h2>Blocked Keywords</h2>
-  <textarea id="keywordInput"></textarea>
-  <button id="saveKeywords">Save Keywords</button>
-
-  <h3>Current Blocked Sites</h3>
-  <ul id="blocklist"></ul>
-
   <script src="options.js"></script>
 </body>
 </html>

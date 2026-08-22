@@ -1,111 +1,106 @@
-# Focus Web Blocker Chrome Extension
----
+<p align="center">
+  <img src="icon128.png" width="96" height="96" alt="FocusGuard icon">
+</p>
 
-## Overview
+<h1 align="center">FocusGuard</h1>
 
-**Focus Web Blocker** helps you stay focused—especially if you're preparing for competitive exams like SSC CGL—by blocking distracting websites and keywords for fixed periods. Set up your custom blocklists, run focus sessions, and manage editing security via password protection.
+<p align="center">
+  Block distracting sites and protect deep work.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Manifest-V3-blue" alt="Manifest V3">
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="MIT License">
+</p>
 
 ---
 
 ## Features
 
-- ✅ Block distracting sites and keywords (customizable lists)
-- ✅ Focus timer (default 30-minute Pomodoro)
-- ✅ Lock blocklist editing during active focus sessions (optional password)
-- ✅ Motivational dashboard and simple popup controls
-- ✅ Session progress tracking
+- **Block by domain or keyword** — one click to block the site you're on, or add keywords that match anywhere in a URL
+- **Password-protected settings** — SHA-256 hashed, 3-attempt lockout with a 30s cooldown, auto-locks after 5 minutes idle
+- **Tab timers** — auto-close a tab after a set time, or just pause its video instead
+- **Progress dashboard** — total blocks, current & best streak, a 7-day chart, and your most-tempting sites
+- **Import/export** your blocklist and keywords as JSON
+- **Dark mode** for the settings page
 
----
+## Installation
 
-## How It Works
+### Option 1: Download a release (recommended)
 
-1. **Add Domains/Keywords:**  
-   Use the options page to list distracting sites/domains or keywords you want to block.
-2. **(Optional) Set Password:**  
-   Protect your blocklist from tampering by setting a password.
-3. **Start Focus Session:**  
-   Launch a session (e.g., 30 minutes). Editing is locked during the session.
-4. **View Progress:**  
-   The dashboard and popup show your current focus, blocklist, and remaining session time.
-5. **Session End:**  
-   You're notified, editing unlocks, and you can adjust blocklists as needed.
+1. Go to the [Releases page](../../releases) and download `focusguard-vX.Y.Z.zip` from the latest release.
+2. Unzip it.
+3. Open `chrome://extensions` in Chrome.
+4. Turn on **Developer mode** (top-right toggle).
+5. Click **Load unpacked** and select the unzipped `focusguard` folder.
 
----
-
-## Getting Started
-
-1. **Install the Extension:**  
-   Clone/download the repo and load it as an unpacked extension in Chrome.
-
-2. **Setup:**
-    - Click the extension icon.
-    - Add websites/domains or keywords you want to block on the options/settings page.
-    - (Optionally) Set a lock password.
-
-3. **Start Using:**
-    - Use the popup to quickly block/unblock the current site, view status, and start/stop focus sessions.
-    - Launch the dashboard to see progress or motivational stats.
-
----
-
-## Main Files and Structure
-
-- `background.js`: Handles session logic, rules, notifications.
-- `popup.js` / `popup-enhanced.js`: Popup interface for fast controls.
-- `options.js`: Blocklist, password, and keyword management UI.
-- `dashboard.js`: (Optional) Motivational dashboard with timer & session info.
-
-**Note:** You will also find `messaging.js` (for custom message handling—expand as needed) and blanked/legacy cleaned files as part of automated cleanup.
-
----
-
-## Customization
-
-- Adjust session lengths and blocklist rules as needed in the code.
-- Extend blocklist logic for more complex needs (e.g., scheduled blocking, wildcards).
-
----
-
-## Installation (for Users)
+### Option 2: Clone from source
 
 ```bash
-# Clone the repository
-git clone https://github.com/HelloSamar/ssc-focus-blocker.git
-
-# In Chrome:
-# 1. Go to chrome://extensions
-# 2. Enable Developer mode (top right)
-# 3. Click "Load unpacked" and select the cloned folder
-# 4. The extension icon will appear in your toolbar—click to launch!
+git clone https://github.com/<your-username>/focusguard.git
 ```
 
-*No tracking, no data sharing—just pure focus!*
+Then follow steps 3–5 above, selecting the cloned `focusguard` folder.
 
----
+## Usage
 
-## 🚀 Launch Checklist
+- Click the FocusGuard icon and press **Block Site** to block whatever site you're currently on.
+- Open **Blocklist** (from the popup or the extension's options) to manage domains, keywords, password, stats, and timers.
+- Set a password on first use — without one, the settings page has nothing to unlock.
+- Start a tab timer from the popup to auto-close a tab, or just pause its video, after a chosen duration.
 
-- [ ] Rename the repo in [GitHub Settings](https://github.com/HelloSamar/ssc-focus-blocker/settings) to `focus-web-blocker` or `ssc-focus-web-blocker`
-- [ ] Verify `manifest.json` exists and points to correct files (`background.js`, `popup.js`, `options.html`)
-- [ ] Test the extension locally by loading into Chrome via `chrome://extensions/`
-- [ ] Verify blocklist, focus timer, and session locking work correctly
-- [ ] (Optional) Add screenshots/GIFs of extension in action to the README
-- [ ] Push all changes to GitHub
-- [ ] (Optional) Submit to [Chrome Web Store](https://chrome.google.com/webstore/developer/dashboard)
+## Permissions
 
----
+| Permission | Why it's needed |
+|---|---|
+| `storage` | Stores your blocklist, keywords, password hash, stats, and timers locally. |
+| `tabs` | Reads the current tab's URL to block it, and manages tabs for the timer feature. |
+| `alarms` | Schedules tab timers so they still fire after the popup closes. |
+| `declarativeNetRequest` | Blocks/redirects requests to sites on your blocklist. |
+| `host_permissions: <all_urls>` | Needed for `declarativeNetRequest` and the content script to work on any site you choose to block. |
 
-## Contributing
+FocusGuard makes no network requests of its own and keeps all data in local browser storage.
 
-Found a bug? Have an idea or want to help support exam-takers everywhere?  
-[Open an issue](https://github.com/HelloSamar/ssc-focus-blocker/issues) or fork the repo and make a pull request!
+## Known limitations
 
----
+- **The settings-page password is a soft lock, not real security.** It deters casual access, but anyone with the extension's own DevTools console open can read or edit its stored data directly. Uninstalling or disabling the extension also removes protection entirely — this is disclosed in the settings page itself.
+- **The "pause video" tab timer only works on tabs opened after install.** Tabs already open when you install (or update) FocusGuard need a refresh before the content script is present.
+
+## Project structure
+
+```
+focusguard/
+├── manifest.json       # Manifest V3 config
+├── background.js       # Service worker: blocklist rules, stats, tab timers
+├── popup.html/.js      # Toolbar popup: block current site, tab timer
+├── options.html/.js    # Settings: blocklist, keywords, password, stats, import/export
+├── dashboard.html/.js  # Shown when a site/keyword is blocked
+├── video-pause.js      # Content script: pauses <video> on "pause instead of close"
+├── icon.svg            # Vector source for the icons (not used by the manifest directly)
+├── icon16.png
+├── icon32.png
+├── icon48.png
+└── icon128.png
+```
+
+## Development
+
+No build step or dependencies — it's plain HTML/CSS/JS.
+
+1. Clone the repo.
+2. Load it unpacked via `chrome://extensions` (see Installation above).
+3. After editing `background.js`, click the refresh icon on the extension's card in `chrome://extensions` to reload the service worker. Editing popup/options/dashboard files just requires reopening them.
+
+## Releasing a new version
+
+This repo includes a GitHub Actions workflow (`.github/workflows/release.yml`) that automatically zips the extension and attaches it to a GitHub Release whenever a version tag is pushed:
+
+```bash
+# bump "version" in manifest.json first, then:
+git tag v1.0.1
+git push origin v1.0.1
+```
 
 ## License
 
-This project is licensed under the MIT License.
-
----
-
-**Good luck with your studies and focus!** 🎯
+Released under the [MIT License](LICENSE).

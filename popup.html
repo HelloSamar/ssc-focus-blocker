@@ -1,45 +1,365 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
+  <meta charset="utf-8"/>
+  <title>FocusGuard</title>
   <style>
-    body {
-      font-family: Arial;
-      width: 260px;
-      padding: 12px;
-      background: #f4f6f8;
+    :root {
+      --white: #ffffff;
+      --bg: #f4f4f2;
+      --ink: #18181b;
+      --ink2: #52525b;
+      --muted: #71717a;
+      --border: #e4e4e7;
+      --bdr2: #d4d4d8;
+      --green: #16a34a;
+      --green2: #15803d;
+      --glow: rgba(22,163,74,0.18);
+      --r: 11px;
     }
 
-    button {
-      width: 100%;
-      padding: 8px;
-      margin-top: 8px;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 276px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      padding: 12px 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 9px 11px;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-row::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--green);
+      border-radius: 4px 0 0 4px;
+    }
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+
+    .brand-name em {
+      font-style: normal;
+      color: var(--green);
+    }
+
+    .brand-sub {
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 8.5px;
+      color: var(--muted);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin-top: 2.5px;
+    }
+
+    .actions-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .action-btn {
       border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 12px;
+      min-height: 38px;
+      padding: 10px 6px;
+      border-radius: var(--r);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+      white-space: nowrap;
+    }
+
+    .action-btn:active { transform: scale(0.96) !important; }
+
+    .action-btn svg {
+      width: 15px;
+      height: 15px;
+      flex: 0 0 auto;
+    }
+
+    .btn-block {
+      background: var(--green);
+      color: #ffffff;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 1px 0 var(--green2), 0 3px 10px var(--glow);
+    }
+
+    .btn-block:hover {
+      background: var(--green2);
+      transform: translateY(-1px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 1px 0 #14532d, 0 5px 14px var(--glow);
+    }
+
+    .btn-list {
+      background: var(--white);
+      color: var(--ink2);
+      border: 1.5px solid var(--bdr2);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .btn-list:hover {
+      border-color: #a1a1aa;
+      color: var(--ink);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.09);
+    }
+
+    .status {
+      min-height: 18px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .status.ok { color: var(--green2); }
+    .status.error { color: #dc2626; }
+
+    .timer-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .timer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .timer-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .timer-title em { font-style: normal; color: var(--green2); }
+
+    .quick-set-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 5px;
+    }
+
+    .quick-btn {
+      background: #f8f8f6;
+      border: 1px solid var(--border);
+      color: var(--ink2);
       border-radius: 6px;
-      font-weight: bold;
+      padding: 5px 2px;
+      font-family: inherit;
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .quick-btn:hover {
+      border-color: var(--green);
+      color: var(--green2);
+      background: #f0fdf4;
+    }
+
+    .duration-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .duration-field {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .duration-field input {
+      width: 100%;
+      text-align: center;
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      background: #f8f8f6;
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      padding: 6px 2px;
+      outline: none;
+    }
+
+    .duration-field input:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px var(--glow);
+    }
+
+    .duration-field label {
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .duration-hint {
+      font-size: 9.5px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: -3px;
+    }
+
+    .pause-toggle {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11.5px;
+      color: var(--ink2);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .pause-toggle input {
+      width: 14px;
+      height: 14px;
+      accent-color: var(--green);
       cursor: pointer;
     }
 
-    .block { background: #d9534f; color: white; }
-    .view { background: #6c757d; color: white; }
-    .focus { background: #0275d8; color: white; }
-    .stop { background: #5bc0de; color: white; }
+    .full-btn { width: 100%; }
 
-    #status {
-      margin-top: 10px;
-      font-size: 13px;
+    .countdown-display {
+      font-family: "Consolas", "SFMono-Regular", monospace;
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--green2);
       text-align: center;
+      letter-spacing: 0.03em;
+    }
+
+    .countdown-sub {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: -6px;
     }
   </style>
 </head>
 <body>
+  <div class="brand-row">
+    <img class="brand-icon" src="icon48.png" alt="FocusGuard"/>
+    <div>
+      <div class="brand-name">Focus<em>Guard</em></div>
+      <div class="brand-sub">focus / block / protect</div>
+    </div>
+  </div>
 
-  <button id="blockCurrent" class="block">Block Current Site</button>
-  <button id="openList" class="view">View Blocklist</button>
+  <div class="actions-row">
+    <button class="action-btn btn-block" id="blockCurrent" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+        <path d="M6.5 17.5 17.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Block Site
+    </button>
+    <button class="action-btn btn-list" id="openList" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 6h11M8 12h11M8 18h11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="4" cy="6" r="1.4" fill="currentColor"/>
+        <circle cx="4" cy="12" r="1.4" fill="currentColor"/>
+        <circle cx="4" cy="18" r="1.4" fill="currentColor"/>
+      </svg>
+      Blocklist
+    </button>
+  </div>
 
-  <div id="status">No sites blocked</div>
+  <div class="status" id="status" role="status" aria-live="polite"></div>
 
-  <button id="startFocus" class="focus">Start 30 Min Focus</button>
-  <button id="stopFocus" class="stop">Stop Timer</button>
+  <div class="timer-card">
+    <div class="timer-header">
+      <span class="timer-title">⏱ Tab <em>Timer</em></span>
+    </div>
+
+    <div id="timerSetup">
+      <div class="quick-set-row">
+        <button class="quick-btn" data-min="1" type="button">1m</button>
+        <button class="quick-btn" data-min="5" type="button">5m</button>
+        <button class="quick-btn" data-min="10" type="button">10m</button>
+        <button class="quick-btn" data-min="15" type="button">15m</button>
+        <button class="quick-btn" data-min="30" type="button">30m</button>
+        <button class="quick-btn" data-min="60" type="button">1h</button>
+      </div>
+
+      <div class="duration-row">
+        <div class="duration-field">
+          <input type="number" id="hInput" min="0" max="99" value="0" inputmode="numeric"/>
+          <label for="hInput">hrs</label>
+        </div>
+        <div class="duration-field">
+          <input type="number" id="mInput" min="0" max="59" value="5" inputmode="numeric"/>
+          <label for="mInput">min</label>
+        </div>
+        <div class="duration-field">
+          <input type="number" id="sInput" min="0" max="59" value="0" inputmode="numeric"/>
+          <label for="sInput">sec</label>
+        </div>
+      </div>
+      <div class="duration-hint">scroll to adjust · hold shift on minutes for ±5</div>
+
+      <label class="pause-toggle">
+        <input type="checkbox" id="pauseInsteadChk"/>
+        Pause video instead of closing
+      </label>
+
+      <button class="action-btn btn-block full-btn" id="startTimerBtn" type="button" style="margin-top:2px;">Start Timer</button>
+    </div>
+
+    <div id="timerRunning" style="display:none;">
+      <div class="countdown-display" id="countdownDisplay">00:00</div>
+      <div class="countdown-sub" id="countdownAction">Tab will close</div>
+      <button class="action-btn btn-list full-btn" id="cancelTimerBtn" type="button" style="margin-top:6px;">Cancel Timer</button>
+    </div>
+  </div>
 
   <script src="popup.js"></script>
 </body>
