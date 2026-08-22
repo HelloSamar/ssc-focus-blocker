@@ -1,8 +1,0 @@
-node_modules
-dist
-build
-*.png
-*.jpg
-*.jpeg
-*.svg
-*.ico
